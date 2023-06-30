@@ -14,7 +14,7 @@ jobs:
         env:
           LUAROCKS_API_KEY: ${{ secrets.LUAROCKS_API_KEY }}
         with:
-          name: gmod
+          # name: gmod -- не влияет на require
           summary: "Functions from Garry's Mod for standalone Lua."
           detailed_description: |
             A set of functions and libraries from Garry's Mod,
