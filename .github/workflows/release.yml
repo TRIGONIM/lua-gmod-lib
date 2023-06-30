@@ -14,15 +14,16 @@ jobs:
         env:
           LUAROCKS_API_KEY: ${{ secrets.LUAROCKS_API_KEY }}
         with:
+          name: gmod
           summary: "Functions from Garry's Mod for standalone Lua."
           detailed_description: |
             A set of functions and libraries from Garry's Mod,
             such as http.*, timer.*, MsgC, PrintTable, string, table, etc.,
             for quickly creating applications using pure Lua (outside the game).
             More info: https://github.com/TRIGONIM/lua-gmod-lib/
-          dependencies: |
-            copas >= 4.3.0
-            lua-requests-async
+          # dependencies: |
+          #   copas >= 4.3.0
+          #   lua-requests-async
           labels: |
             copas
             requests
