@@ -1,20 +1,22 @@
-local string = {}
+local str = {}
 
 do -- string.Split, Explode
-	function string.ToTable( str )
+	local string_len = string.len
+	local string_sub = string.sub
+
+	function str.ToTable( str )
 		local tbl = {}
 
-		for i = 1, string.len( str ) do
-			tbl[i] = string.sub( str, i, i )
+		for i = 1, string_len( str ) do
+			tbl[i] = string_sub( str, i, i )
 		end
 
 		return tbl
 	end
 
-	local totable = string.ToTable
-	local string_sub = string.sub
+	local totable = str.ToTable
 	local string_find = string.find
-	local string_len = string.len
+
 	function string.Explode(separator, str, withpattern)
 		if ( separator == "" ) then return totable( str ) end
 		if ( withpattern == nil ) then withpattern = false end
@@ -34,9 +36,9 @@ do -- string.Split, Explode
 		return ret
 	end
 
-	function string.Split( str, delimiter )
-		return string.Explode( delimiter, str )
+	function str.Split( str, delimiter )
+		return str.Explode( delimiter, str )
 	end
 end
 
-return string
+return str

@@ -1,6 +1,6 @@
-local table = {}
+local tab = {}
 
-function table.Copy( t, lookup_table )
+function tab.Copy( t, lookup_table )
 	if ( t == nil ) then return nil end
 
 	local copy = {}
@@ -14,11 +14,11 @@ function table.Copy( t, lookup_table )
 			if ( lookup_table[ v ] ) then
 				copy[ i ] = lookup_table[ v ] -- we already copied this table. reuse the copy.
 			else
-				copy[ i ] = table.Copy( v, lookup_table ) -- not yet copied. copy it.
+				copy[ i ] = tab.Copy( v, lookup_table ) -- not yet copied. copy it.
 			end
 		end
 	end
 	return copy
 end
 
-return table
+return tab
