@@ -21,4 +21,11 @@ function tab.Copy( t, lookup_table )
 	return copy
 end
 
+function tab.HasValue( t, val )
+	for k, v in pairs( t ) do
+		if ( v == val ) then return true end
+	end
+	return false
+end
+
 return tab
