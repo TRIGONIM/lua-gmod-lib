@@ -2,22 +2,20 @@
 #todo
 
 - Find a more elegant way to set the path for storing data
-- Support not only Linux but also Windows
 - The optional support for an SQLite database, as in Garry's Mod.
 ]]
 
+local file = require("gmod.file")
+
 local cookie = {}
 
-local tmppath = GG_COOKIE_DATADIR or "gmodlib"
-os.execute("mkdir -p " .. tmppath)
+---@diagnostic disable-next-line: undefined-global
+local DATA_PATH = GG_COOKIE_DATADIR or "data"
+file.CreateDir(DATA_PATH)
 
 function cookie.GetString(name, default)
-	local f = io.open(tmppath .. "/" .. name .. ".txt", "r")
-	if not f then return default end
-
-	local result = f:read("*all")
-	f:close()
-	return result
+	local content = file.Read(DATA_PATH .. "/" .. name .. ".txt")
+	return content or default
 end
 
 function cookie.GetNumber(name, default)
@@ -25,13 +23,11 @@ function cookie.GetNumber(name, default)
 end
 
 function cookie.Set(name, value)
-	local f = assert(io.open(tmppath .. "/" .. name .. ".txt", "w"))
-	f:write(value)
-	f:close()
+	file.Write(DATA_PATH .. "/" .. name .. ".txt", value)
 end
 
 function cookie.Delete(name)
-	local ok, err = os.remove(tmppath .. "/" .. name .. ".txt")
+	local ok, err = os.remove(DATA_PATH .. "/" .. name .. ".txt")
 	return ok, err
 end
 
