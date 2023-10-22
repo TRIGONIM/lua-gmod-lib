@@ -58,4 +58,8 @@ do
 	end
 end
 
+local hash = require("gmod.deps.hash")
+util.SHA256 = hash.SHA256
+util.MD5    = hash.MD5
+
 return util
