@@ -9,7 +9,8 @@ end
 
 -- package.path = string.format("../?.lua;%s", package.path)
 
-local ma = require("gmod.math")
+local math_Round = require("gmod.math").Round
+local table_SortByMember = require("gmod.table").SortByMember
 
 local export = {}
 
@@ -46,10 +47,10 @@ do -- Msg, MsgN, MsgC
 		if (r == g) and (g == b) then
 			if (r < 8)   then return 16  end
 			if (r > 248) then return 231 end
-			return ma.Round(((r - 8) / 247) * 24) + 232
+			return math_Round(((r - 8) / 247) * 24) + 232
 		end
 
-		return 16 + (36 * ma.Round(r / 255 * 5)) + (6 * ma.Round(g / 255 * 5)) + ma.Round(b / 255 * 5)
+		return 16 + (36 * math_Round(r / 255 * 5)) + (6 * math_Round(g / 255 * 5)) + math_Round(b / 255 * 5)
 	end
 
 	local colorClearSequence = '\27[0m'
@@ -148,6 +149,58 @@ do -- PrintTable
 			MsgN("")
 		end
 	end
+end
+
+do -- SortedPairs, SortedPairsByValue, SortedPairsByMemberValue
+	local keyValuePairs = function(state)
+		state.Index = state.Index + 1
+
+		local keyValue = state.KeyValues[ state.Index ]
+		if not keyValue then return end
+
+		return keyValue.key, keyValue.val
+	end
+
+	local toKeyValues = function(tbl)
+		local result = {}
+		for k, v in pairs(tbl) do
+			table.insert(result, {key = k, val = v})
+		end
+		return result
+	end
+
+	local function SortedPairs(pTable, bDesc)
+		local sortedTbl = toKeyValues(pTable)
+		if bDesc then
+			table.sort(sortedTbl, function( a, b ) return a.key > b.key end)
+		else
+			table.sort(sortedTbl, function( a, b ) return a.key < b.key end)
+		end
+		return keyValuePairs, {Index = 0, KeyValues = sortedTbl}
+	end
+
+	local function SortedPairsByValue(pTable, bDesc)
+		local sortedTbl = toKeyValues(pTable)
+		if bDesc then
+			table.sort(sortedTbl, function(a, b) return a.val > b.val end)
+		else
+			table.sort(sortedTbl, function(a, b) return a.val < b.val end)
+		end
+		return keyValuePairs, {Index = 0, KeyValues = sortedTbl}
+	end
+
+	local function SortedPairsByMemberValue(pTable, pValueName, bDesc)
+		local sortedTbl = toKeyValues(pTable)
+		for _, v in pairs(sortedTbl) do
+			v.member = v.val[pValueName]
+		end
+		table_SortByMember(sortedTbl, "member", not bDesc)
+		return keyValuePairs, {Index = 0, KeyValues = sortedTbl}
+	end
+
+	export.SortedPairs = SortedPairs
+	export.SortedPairsByValue = SortedPairsByValue
+	export.SortedPairsByMemberValue = SortedPairsByMemberValue
 end
 
 return export

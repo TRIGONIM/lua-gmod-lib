@@ -28,4 +28,33 @@ function tab.HasValue( t, val )
 	return false
 end
 
+do -- SortByMember
+	local TableMemberSort = function(a, b, MemberName, bReverse)
+		if type(a) ~= "table" then return not bReverse end
+		if type(b) ~= "table" then return bReverse end
+		if not a[MemberName] then return not bReverse end
+		if not b[MemberName] then return bReverse end
+
+		if type(a[MemberName]) == "string" then
+			if ( bReverse ) then
+				return a[MemberName]:lower() < b[MemberName]:lower()
+			else
+				return a[MemberName]:lower() > b[MemberName]:lower()
+			end
+		end
+
+		if bReverse then
+			return a[MemberName] < b[MemberName]
+		else
+			return a[MemberName] > b[MemberName]
+		end
+	end
+
+	function tab.SortByMember(Table, MemberName, bAsc)
+		table.sort(Table, function(a, b)
+			return TableMemberSort(a, b, MemberName, bAsc or false)
+		end)
+	end
+end
+
 return tab
