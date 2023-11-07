@@ -24,6 +24,8 @@ function timer.Create(name, delay, reps, callback)
 				self:cancel()
 			end
 		end,
+
+		callback_orig = callback,
 	})
 
 	if name then -- skip timer.Simple
@@ -37,11 +39,23 @@ function timer.Simple(delay, callback)
 	return timer.Create(nil, delay, 1, callback)
 end
 
+function timer.Adjust(identifier, delay, repetitions, func)
+	local t = timer.Remove(identifier)
+	if not t then return false end
+
+	delay       = delay       or t.delay
+	repetitions = repetitions or t.repetitions
+	func        = func        or t.callback_orig
+
+	return timer.Create(identifier, delay, repetitions, func)
+end
+
 function timer.Remove(name)
 	local t = co_timer.map[name]
 	if t then
 		t:cancel()
 		co_timer.map[name] = nil
+		return t
 	end
 end
 
