@@ -57,12 +57,14 @@ do -- Msg, MsgN, MsgC
 	function export.MsgC(...)
 		local outText = colorClearSequence
 
-		for _, v in ipairs({...}) do
+		local count = select("#", ...)
+		for i = 1, count do
+			local v = select(i, ...)
 			if type(v) == "table" and v.r and v.g and v.b then
 				local code = rgbToAnsi256(v.r, v.g, v.b)
 				outText = outText .. '\27[38;5;' .. string.match(code, "(%d*)%.?%d*") .. 'm' -- match убирает мантиссу. В гмоде ее нет, а в pure lua чет есть
 			else -- str, int, just append
-				outText = outText .. v
+				outText = outText .. tostring(v)
 			end
 		end
 
