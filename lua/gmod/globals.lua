@@ -21,13 +21,62 @@ function export.isstring(v) return type(v) == "string"  end
 
 
 -- http.Fetch, http.Post in separate file
-local ok, http = pcall(require, "http_async")
-if not ok then
-	function export.HTTP(tParams)
-		print("Missing dependency: http_async (https://github.com/TRIGONIM/lua-requests-async)")
+local copok, copas = pcall(require, "copas")
+local htpok, http  = pcall(require, "http_v2")
+if not (htpok and copok) then
+	function export.HTTP()
+		print("Missing dependency: lua-requests (https://github.com/TRIGONIM/lua-requests-async)")
 	end
 else
-	export.HTTP = http.request
+	-- https://wiki.facepunch.com/gmod/Global.HTTP
+	-- f failed, f success, s method, s url, t parameters
+	-- t headers, s body (for POST), s type, i timeout
+	export.HTTP = function(struct)
+		return copas.addnamedthread("http_request", function()
+			copas.setErrorHandler(function(msg, co, skt)
+				if struct.failed then
+					local suberror = tostring(msg):match("TLS/SSL handshake failed: (.*)$") or tostring(msg) -- closed/System error/{}
+					struct.failed("copas_error:" .. suberror) -- can be parsed if needed
+				else
+					-- Однажды попал на /usr/local/share/lua/5.1/copas.lua:70: /usr/local/share/lua/5.1/copas.lua:740: module 'ssl' not found:
+					-- Не обработал и долго не мог понять почему запрос не делается. Оказалось luasec..
+					print("Unhandled http_request error:", tostring(msg), co, skt)
+				end
+			end)
+
+			assert(struct.url, "url required")
+
+			-- гмод лимитит хедеры и создал такой параметр.
+			-- За пределами гмода не нужно, но для совместимости надо
+			struct.headers = struct.headers or {}
+			struct.headers["content-type"] = struct.headers["content-type"] or struct.type or "text/plain; charset=utf-8"
+
+			-- особенность POST. Для совпадения с гмодом
+			if struct.method == "POST" and struct.parameters then
+				struct.headers["content-type"] = "application/x-www-form-urlencoded"
+				struct.body = http.build_query(struct.parameters)
+				struct.parameters = nil
+			end
+
+			local paramss = struct.parameters and http.build_query(struct.parameters)
+			local url = struct.url .. (paramss and "?" .. paramss or "")
+			struct.fullurl = url
+
+			-- in case of errors: "timeout" or err str instead of code
+			local res, code, headers, _ = http.copas_request(struct.method, url, struct.body, struct.headers, struct.timeout)
+			if res and struct.success then
+				local ok, err = pcall(struct.success, code, res, headers)
+				if not ok then
+					print(debug.traceback("HTTP Error In The Success Callback\n\t" .. tostring(err))) -- custom funcs can error({array})
+				end
+			elseif not res and struct.failed then
+				local ok, err = pcall(struct.failed, code) -- err str instead of code
+				if not ok then
+					print(debug.traceback("HTTP Error In The Failed Callback\n\t" .. tostring(err))) -- custom funcs can error({array})
+				end
+			end
+		end)
+	end
 end
 
 function export.Color(r, g, b, a)
