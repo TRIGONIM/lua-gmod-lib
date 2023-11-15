@@ -2,24 +2,23 @@ local util = {}
 
 -- json related
 do
-	local included, json = pcall(require, "cjson")
+	local included, json = pcall(require, "cjson.safe")
 
 	function util.JSONToTable(js)
 		if not included then error("Missed dependency: cjson") end
-
-		local decoded, res = pcall(json.decode, js) -- nil if can't decode
-		if not decoded then
-			print( debug.traceback("can't decode json\n\t" .. res) )
-			return nil
-		end
-		return res
+		return json.decode(js)
 	end
 
+	-- #note there is dome difference between gmod and this implementation.
+	-- e.g. in gmod, if table contains functions, it will be just skipped
+	-- but cjson throws an error on it and there is no way to skip functions.
+	-- so this function just returns nil if can't encode
 	local prettyjson = require("gmod.deps.prettyjson")
 	function util.TableToJSON(t, bPretty)
 		if not included then error("Missed dependency: cjson") end
 
-		local json_str = json.encode(t)
+		local json_str, err = json.encode(t)
+		if err then return nil, err end
 		if not bPretty then return json_str end
 		return prettyjson(json_str, "\n", "\t", " ")
 	end
