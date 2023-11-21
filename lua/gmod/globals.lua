@@ -88,7 +88,9 @@ do -- Msg, MsgN, MsgC
 
 	local Msg = export.Msg
 	function export.MsgN(...)
-		return Msg(..., "\n")
+		local args = {...}
+		args[#args + 1] = "\n"
+		return Msg(unpack(args))
 	end
 
 	-- https://stackoverflow.com/questions/15682537/ansi-color-specific-rgb-sequence-bash?answertab=votes#tab-top
