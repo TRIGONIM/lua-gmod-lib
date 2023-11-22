@@ -6,4 +6,8 @@ function ma.Round( num, idp )
 	return math.floor( num * mult + 0.5 ) / mult
 end
 
+function ma.Clamp( _in, low, high )
+	return math.min( math.max( _in, low ), high )
+end
+
 return ma
