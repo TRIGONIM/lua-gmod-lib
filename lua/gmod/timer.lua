@@ -1,10 +1,11 @@
-local ok, res = pcall(require, "copas.timer")
-if not ok then error("Missed dependency: copas.timer") end
+-- local ok, res = pcall(require, "copas.timer")
+-- if not ok then error("Missed dependency: copas.timer") end
+
+local co_timer = require("copas.timer")
+co_timer.map = co_timer.map or {}
 
 local timer = {}
 
-local co_timer = res
-co_timer.map = co_timer.map or {}
 
 function timer.Create(name, delay, reps, callback)
 	reps = math.floor(reps) -- float will cause an infinite loop
