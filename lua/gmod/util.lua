@@ -58,7 +58,9 @@ do
 end
 
 local hash = require("gmod.deps.hash")
+local sha1 = require("gmod.deps.sha1")
 util.SHA256 = hash.SHA256
 util.MD5    = hash.MD5
+util.SHA1   = sha1.encode
 
 return util
