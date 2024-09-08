@@ -1,20 +1,21 @@
 # source: https://github.com/TRIGONIM/lua-requests-async/blob/main/.github/workflows/release.yml
-name: "release"
+name: "Luarocks Release"
+
 on:
   push:
-    tags:
-      - 'v*'
+    branches: [ "main" ]
+    tags: [ "v*.*.*" ]
+
 jobs:
-  luarocks-upload:
-    runs-on: ubuntu-22.04
+  luarocks-release:
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v3
-      - name: LuaRocks Upload
-        uses: nvim-neorocks/luarocks-tag-release@v4
+      - uses: actions/checkout@v4
+      - uses: nvim-neorocks/luarocks-tag-release@v7
         env:
           LUAROCKS_API_KEY: ${{ secrets.LUAROCKS_API_KEY }}
         with:
-          # name: gmod -- не влияет на require
+          extra_luarocks_args: --force # update lr version on commit
           summary: "Functions from Garry's Mod for standalone Lua."
           detailed_description: |
             A set of functions and libraries from Garry's Mod,
