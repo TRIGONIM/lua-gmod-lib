@@ -33,7 +33,7 @@ else
 	-- t headers, s body (for POST), s type, i timeout
 	export.HTTP = function(struct)
 		return copas.addnamedthread("http_request", function()
-			copas.setErrorHandler(function(msg, co, skt)
+			copas.seterrorhandler(function(msg, co, skt)
 				if struct.failed then
 					local suberror = tostring(msg):match("TLS/SSL handshake failed: (.*)$") or tostring(msg) -- closed/System error/{}
 					struct.failed("copas_error:" .. suberror) -- can be parsed if needed
