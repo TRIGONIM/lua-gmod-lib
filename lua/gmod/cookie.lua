@@ -1,7 +1,6 @@
 --[[
 #todo
 
-- Find a more elegant way to set the path for storing data
 - The optional support for an SQLite database, as in Garry's Mod.
 ]]
 
@@ -9,11 +8,15 @@ local file = require("gmod.file")
 
 local cookie = {}
 
----@diagnostic disable-next-line: undefined-global
-local DATA_PATH = GG_COOKIE_DATADIR or "data"
-file.CreateDir(DATA_PATH)
+local DATA_PATH
+
+function cookie.SetDataPath(path)
+	DATA_PATH = path
+	file.CreateDir(DATA_PATH)
+end
 
 function cookie.GetString(name, default)
+	assert(DATA_PATH, "Use cookie.SetDataPath(path) first to set the path for storing data")
 	local content = file.Read(DATA_PATH .. "/" .. name .. ".txt")
 	return content or default
 end
@@ -23,12 +26,13 @@ function cookie.GetNumber(name, default)
 end
 
 function cookie.Set(name, value)
+	assert(DATA_PATH, "Use cookie.SetDataPath(path) first to set the path for storing data")
 	file.Write(DATA_PATH .. "/" .. name .. ".txt", value)
 end
 
 function cookie.Delete(name)
-	local ok, err = os.remove(DATA_PATH .. "/" .. name .. ".txt")
-	return ok, err
+	assert(DATA_PATH, "Use cookie.SetDataPath(path) first to set the path for storing data")
+	file.Delete(DATA_PATH .. "/" .. name .. ".txt") -- ok, err
 end
 
 return cookie
