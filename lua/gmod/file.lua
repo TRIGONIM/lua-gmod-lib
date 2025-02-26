@@ -33,4 +33,9 @@ function file.Read(path)
 	return nil
 end
 
+function file.Delete(name)
+	local ok, err = os.remove(name)
+	return ok, err
+end
+
 return file
